@@ -35,7 +35,7 @@ class Seq2SickAttack(BaselineAttack):
             scores.extend([len(set(ori_trans) & set(s)) for s in new_trans_seqs])
         pred_len = np.array([self.compute_seq_len(torch.tensor(seq)) for seq in seqs])
         scores = np.array(scores)
-        sel_index = scores.argmax()   #! FIXME: This is the only place where the score is minimized
+        sel_index = scores.argmin()   #! FIXME: This is the only place where the score is minimized
         return [new_strings[sel_index]], scores[sel_index], pred_len[sel_index]
 
     def run_attack(self, text):
