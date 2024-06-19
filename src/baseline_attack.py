@@ -1,6 +1,5 @@
 import torch
 import numpy as np
-from tqdm import tqdm
 from copy import deepcopy
 
 from .base_attack import BaselineAttack
@@ -45,19 +44,27 @@ class Seq2SickAttack(BaselineAttack):
         modify_pos = []
 
         for _ in pbar:
+            print('Computing loss')
             loss = self.compute_loss(text)
+            print('Doing backward')
             self.model.zero_grad()
             loss.backward()
             grad = self.embedding.grad
+            print('Finding token replace mutation')
             new_strings = self.token_replace_mutation(current_adv_text, grad, modify_pos)
 
+            print('Selecting best appearance')
             current_adv_text, _, _ = self.select_apperance_best(new_strings, ori_trans)
             assert len(current_adv_text) == 1, 'current_adv_text should be a list of one string'
             current_adv_text = current_adv_text[0]
 
+            print('Found adversarial text!')
+
             with torch.no_grad():
                 # self.model is T5ForConditionalGeneration
+                print('Tokenizing input')
                 input_ids = self.tokenizer(text[0], return_tensors="pt", padding=True).input_ids.to(self.device)
+                print('Generating original output')
                 output = self.model.generate(input_ids=input_ids, max_length=100)
 
                 original_text = text[0]
@@ -65,7 +72,9 @@ class Seq2SickAttack(BaselineAttack):
                 # print('ORI_TEXT:', original_text, '\n')
                 # print('ORI_TEXT_OUTPUT:', original_output, '\n')
                 
+                print('Tokenizing adv input')
                 input_ids = self.tokenizer(current_adv_text, return_tensors="pt", padding=True).input_ids.to(self.device)
+                print('Generating adv output')
                 output = self.model.generate(input_ids=input_ids, max_length=100)
 
                 adversarial_text = current_adv_text.replace('</s>', '')
@@ -74,6 +83,7 @@ class Seq2SickAttack(BaselineAttack):
                 # print('DECODED_ADV_OUTPUT:', adversarial_output)
                 # print('\n-----\n', flush=True)
 
+            print('Returning from attack')
             return (original_text, original_output, adversarial_text, adversarial_output)
 
     def compute_loss(self, text):
