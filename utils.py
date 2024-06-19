@@ -94,7 +94,7 @@ def load_dataset(model_name):
         
     elif model_name == 'google/pegasus-xsum':
         # FIXME: Use the WikiHow dataset
-        with open('./data/translation2019zh/valid.en', 'r') as f:
+        with open('./data/xsum.txt', 'r') as f:
             data = f.readlines()
             return data
 
