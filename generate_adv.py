@@ -1,4 +1,3 @@
-import datetime
 import os
 import sys
 import torch
@@ -35,13 +34,11 @@ def main(task_id, attack_id, beam):
     task_name = 'attack_type:' + str(attack_id) + '_' + 'model_type:' + str(task_id)
 
     results = []
-    t1 = datetime.datetime.now()
     for i, src_text in enumerate(dataset):
         if i == 0:
             continue
         if i >= MAX_TESTING_NUM:
             break
-        # src_text = 'See gewohnt comprehensive for more information. </s>' # 'dataset[21]
         src_text = src_text.replace('\n', '')
         is_success, adv_his = attack.run_attack([src_text])
         if not is_success:
@@ -60,8 +57,6 @@ def main(task_id, attack_id, beam):
         assert len(adv_his) == config['max_per'] + 1
         results.append(adv_his)
         torch.save(results, 'adv/' + task_name + '_' + str(beam) + '.adv')
-    t2 = datetime.datetime.now()
-    print(t2 - t1)
     torch.save(results, 'adv/' + task_name + '_' + str(beam) + '.adv')
 
 
