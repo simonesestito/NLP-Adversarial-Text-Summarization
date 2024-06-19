@@ -10,13 +10,7 @@ BEAM_LIST = [4, 5, 1, 5]
 OUR_BEST_MODEL = 'google/pegasus-xsum'
 
 MODEL_NAME_LIST = [ 'google/pegasus-xsum' ]
-MODEL_WEIGHT = 'model_weight'
 ATTACKLIST = [ Seq2SickAttack ]
-
-if not os.path.isdir('res'):
-    os.mkdir('res')
-if not os.path.isdir(MODEL_WEIGHT):
-    os.mkdir(MODEL_WEIGHT)
 
 
 def load_model(model_name):

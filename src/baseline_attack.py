@@ -36,12 +36,12 @@ class Seq2SickAttack(BaselineAttack):
         return [new_strings[sel_index]], scores[sel_index], pred_len[sel_index]
 
     def run_attack(self, text):
-        assert len(text) == 1
+        assert len(text) == 1, 'Only support batch_size=1'
         ori_trans, ori_len = self.get_trans_string_len(text)     # int
         ori_trans = ori_trans.tolist()
         current_adv_text, current_len = deepcopy(text), ori_len  # current_adv_text: List[str]
-        adv_his = [(deepcopy(current_adv_text[0]), current_len, 0.0)]
-        pbar = tqdm(range(1)) # Enforce to run only once, it is enough in our experiments    range((self.max_per))
+        # adv_his = [(deepcopy(current_adv_text[0]), current_len, 0.0)]
+        pbar = range(1) # Enforce to run only once, it is enough in our experiments    tqdm(range((self.max_per)))
         modify_pos = []
 
         for _ in pbar:
@@ -51,22 +51,30 @@ class Seq2SickAttack(BaselineAttack):
             grad = self.embedding.grad
             new_strings = self.token_replace_mutation(current_adv_text, grad, modify_pos)
 
-            current_adv_text, _, __ = self.select_apperance_best(new_strings, ori_trans)
+            current_adv_text, _, _ = self.select_apperance_best(new_strings, ori_trans)
+            assert len(current_adv_text) == 1, 'current_adv_text should be a list of one string'
+            current_adv_text = current_adv_text[0]
 
             with torch.no_grad():
                 # self.model is T5ForConditionalGeneration
                 input_ids = self.tokenizer(text[0], return_tensors="pt", padding=True).input_ids.to(self.device)
                 output = self.model.generate(input_ids=input_ids, max_length=100)
-                print('ORI_TEXT:', text[0], '\n')
-                print('ORI_TEXT_OUTPUT:', self.tokenizer.decode(output[0], skip_special_tokens=True), '\n')
+
+                original_text = text[0]
+                original_output = self.tokenizer.decode(output[0], skip_special_tokens=True)
+                # print('ORI_TEXT:', original_text, '\n')
+                # print('ORI_TEXT_OUTPUT:', original_output, '\n')
                 
                 input_ids = self.tokenizer(current_adv_text, return_tensors="pt", padding=True).input_ids.to(self.device)
                 output = self.model.generate(input_ids=input_ids, max_length=100)
-                print('BEST_ADV_TEXT:', current_adv_text, '\n')
-                print('DECODED_ADV_OUTPUT:', self.tokenizer.decode(output[0], skip_special_tokens=True))
-                print('\n-----\n', flush=True)
 
-            return current_adv_text
+                adversarial_text = current_adv_text.replace('</s>', '')
+                adversarial_output = self.tokenizer.decode(output[0], skip_special_tokens=True)
+                # print('BEST_ADV_TEXT:', adversarial_text, '\n')
+                # print('DECODED_ADV_OUTPUT:', adversarial_output)
+                # print('\n-----\n', flush=True)
+
+            return (original_text, original_output, adversarial_text, adversarial_output)
 
     def compute_loss(self, text):
         scores, seqs, pred_len = self.compute_score(text)

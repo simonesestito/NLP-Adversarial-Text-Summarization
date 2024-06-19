@@ -2,13 +2,11 @@ import os
 import sys
 import torch
 import argparse
-
+import datetime
+import json
 
 from utils import *
 
-
-if not os.path.isdir('adv'):
-    os.mkdir('adv')
 
 MAX_TESTING_NUM = 5
 
@@ -18,7 +16,7 @@ def main(task_id, attack_id, beam):
     model_name = MODEL_NAME_LIST[task_id]
     # model_name = 'T5-small'
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    model, tokenizer, space_token, dataset, src_lang, tgt_lang = load_model_dataset(model_name) # model = T5ForConditionalGeneration
+    model, tokenizer, space_token, dataset, src_lang, tgt_lang = load_model_dataset(model_name)
     print('load model %s successful' % model_name, file=sys.stderr)
     beam = model.config.num_beams if beam is None else beam
     config = {
@@ -31,33 +29,43 @@ def main(task_id, attack_id, beam):
     }
     attack_class = ATTACKLIST[attack_id]
     attack = attack_class(model, tokenizer, space_token, device, config)
-    task_name = 'attack_type:' + str(attack_id) + '_' + 'model_type:' + str(task_id)
 
     results = []
-    for i, src_text in enumerate(dataset):
-        if i == 0:
-            continue
-        if i >= MAX_TESTING_NUM:
-            break
-        src_text = src_text.replace('\n', '')
-        is_success, adv_his = attack.run_attack([src_text])
-        if not is_success:
-            print('error', file=sys.stderr)
-            sys.exit(1)
-        for tmp in adv_his:
-            assert type(tmp[0]) == str
-            assert type(tmp[1]) == int
-            assert type(tmp[2]) == float
+    try:
+        print('[')  # JSON array only to stdout
+        for i, src_text in enumerate(dataset):
+            if i == 0:
+                continue
+            if i >= MAX_TESTING_NUM:
+                break
+            src_text = src_text.replace('\n', '')
+            original_text, original_output, adversarial_text, adversarial_output = attack.run_attack([src_text])
+            result_dict = {
+                'original_text': original_text,
+                'original_output': original_output,
+                'adversarial_text': adversarial_text,
+                'adversarial_output': adversarial_output
+            }
+            results.append(result_dict)
 
-        if len(adv_his) != config['max_per'] + 1:
-            delta = config['max_per'] + 1 - len(adv_his)
-            for _ in range(delta):
-                adv_his.append(adv_his[-1])
+            # Also, log to stdout
+            print(json.dumps(result_dict, indent=2), end=',\n')
+    except KeyboardInterrupt:
+        print('\033[1;31mCaught KeyboardInterrupt! Saving results so far...\033[0m', file=sys.stderr, flush=True)
+    finally:
+        print(']')
+    
+        # Save result to JSON file
+        current_timestamp = get_current_timestamp()
+        result_filename = 'adversarial_result__%s.json' % current_timestamp
+        with open(result_filename, 'w') as f:
+            json.dump(results, f, indent=4)
+        print('Save result to %s' % result_filename, file=sys.stderr)
 
-        assert len(adv_his) == config['max_per'] + 1
-        results.append(adv_his)
-        torch.save(results, 'adv/' + task_name + '_' + str(beam) + '.adv')
-    torch.save(results, 'adv/' + task_name + '_' + str(beam) + '.adv')
+
+def get_current_timestamp() -> str:
+    now = datetime.datetime.now()
+    return now.strftime('%Y-%m-%d-%H-%M-%S')
 
 
 if __name__ == '__main__':
