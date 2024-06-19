@@ -1,7 +1,4 @@
-import time
-
 import torch
-import torch.nn as nn
 import numpy as np
 from tqdm import tqdm
 from copy import deepcopy
@@ -42,27 +39,19 @@ class Seq2SickAttack(BaselineAttack):
         assert len(text) == 1
         ori_trans, ori_len = self.get_trans_string_len(text)     # int
         ori_trans = ori_trans.tolist()
-        best_adv_text, best_len, best_score = text.copy()[0], ori_len, len(ori_trans)
         current_adv_text, current_len = deepcopy(text), ori_len  # current_adv_text: List[str]
         adv_his = [(deepcopy(current_adv_text[0]), current_len, 0.0)]
-        pbar = tqdm(range(self.max_per))
+        pbar = tqdm(range(1)) # Enforce to run only once, it is enough in our experiments    range((self.max_per))
         modify_pos = []
 
-        t1 = time.time()
-        for it in pbar:
+        for _ in pbar:
             loss = self.compute_loss(text)
             self.model.zero_grad()
             loss.backward()
             grad = self.embedding.grad
             new_strings = self.token_replace_mutation(current_adv_text, grad, modify_pos)
 
-            current_adv_text, current_score, current_len = self.select_apperance_best(new_strings, ori_trans)
-
-            log_str = "%d, %d, %d, %.2f" % (it, len(new_strings), best_score, best_len / ori_len)
-            pbar.set_description(log_str)
-            if current_score < best_score:
-                best_adv_text = current_adv_text[0]
-                best_score = current_score
+            current_adv_text, _, __ = self.select_apperance_best(new_strings, ori_trans)
 
             with torch.no_grad():
                 # self.model is T5ForConditionalGeneration
@@ -77,9 +66,7 @@ class Seq2SickAttack(BaselineAttack):
                 print('DECODED_ADV_OUTPUT:', self.tokenizer.decode(output[0], skip_special_tokens=True))
                 print('\n-----\n', flush=True)
 
-            t2 = time.time()
-            adv_his.append((best_adv_text, best_len, t2 - t1))
-        return True, adv_his
+            return current_adv_text
 
     def compute_loss(self, text):
         scores, seqs, pred_len = self.compute_score(text)
