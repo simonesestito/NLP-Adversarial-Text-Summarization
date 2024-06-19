@@ -42,8 +42,6 @@ def main(task_id, attack_id, beam, resume_from_index=0):
     results = []
     try:
         for i, src_text in enumerate(dataset[resume_from_index:]):
-            if i == 0:
-                continue
             if i >= MAX_TESTING_NUM:
                 break
             src_text = src_text.replace('\n', '')
@@ -76,11 +74,10 @@ def get_current_timestamp() -> str:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Transformer')
-    parser.add_argument('--data', default=0, type=int, help='experiment subjects')
-    parser.add_argument('--attack', default=0, type=int, help='attack type')
     parser.add_argument('--beam', default=2, type=int, help='beam size')
+    parser.add_argument('--resume-from-index', default=0, type=int, help='Index of the dataset sample to resume from')
     args = parser.parse_args()
-    main(args.data, args.attack, args.beam)
+    main(0, 0, args.beam, args.resume_from_index)
     exit(0)
 
 
