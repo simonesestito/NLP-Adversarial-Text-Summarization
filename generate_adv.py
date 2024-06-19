@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 import torch
 import argparse
 
@@ -19,7 +20,7 @@ def main(task_id, attack_id, beam):
     # model_name = 'T5-small'
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model, tokenizer, space_token, dataset, src_lang, tgt_lang = load_model_dataset(model_name) # model = T5ForConditionalGeneration
-    print('load model %s successful' % model_name)
+    print('load model %s successful' % model_name, file=sys.stderr)
     beam = model.config.num_beams if beam is None else beam
     config = {
         'num_beams': beam,
@@ -44,7 +45,8 @@ def main(task_id, attack_id, beam):
         src_text = src_text.replace('\n', '')
         is_success, adv_his = attack.run_attack([src_text])
         if not is_success:
-            print('error')
+            print('error', file=sys.stderr)
+            sys.exit(1)
         for tmp in adv_his:
             assert type(tmp[0]) == str
             assert type(tmp[1]) == int
