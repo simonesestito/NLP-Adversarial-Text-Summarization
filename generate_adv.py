@@ -57,7 +57,6 @@ def main(task_id, attack_id, beam, resume_from_index=0):
             results.append(result_dict)
 
             # Also, log the result to console
-            print('Pretty printing!')
             pretty_print_results([result_dict], tokenizer)
     except KeyboardInterrupt:
         print(ANSI_RED_BOLD, 'Caught KeyboardInterrupt! Saving results so far...', ANSI_RESET, flush=True, sep='')

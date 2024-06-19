@@ -1,10 +1,10 @@
+import sys
 import torch
 import numpy as np
 from copy import deepcopy
 
 from .base_attack import BaselineAttack
 from .TranslateAPI import translate
-
 
 class Seq2SickAttack(BaselineAttack):
     def __init__(self, model, tokenizer, space_token, device, config):
@@ -38,33 +38,35 @@ class Seq2SickAttack(BaselineAttack):
         assert len(text) == 1, 'Only support batch_size=1'
         ori_trans, ori_len = self.get_trans_string_len(text)     # int
         ori_trans = ori_trans.tolist()
-        current_adv_text, current_len = deepcopy(text), ori_len  # current_adv_text: List[str]
+        current_adv_text, _ = deepcopy(text), ori_len  # current_adv_text: List[str]
         # adv_his = [(deepcopy(current_adv_text[0]), current_len, 0.0)]
         pbar = range(1) # Enforce to run only once, it is enough in our experiments    tqdm(range((self.max_per)))
         modify_pos = []
 
+        debug_log('Starting attack', is_first=True)
+
         for _ in pbar:
-            print('Computing loss')
+            debug_log('Computing loss')
             loss = self.compute_loss(text)
-            print('Doing backward')
+            debug_log('Doing backward')
             self.model.zero_grad()
             loss.backward()
             grad = self.embedding.grad
-            print('Finding token replace mutation')
+            debug_log('Finding token replace mutation')
             new_strings = self.token_replace_mutation(current_adv_text, grad, modify_pos)
 
-            print('Selecting best appearance')
+            debug_log('Selecting best appearance')
             current_adv_text, _, _ = self.select_apperance_best(new_strings, ori_trans)
             assert len(current_adv_text) == 1, 'current_adv_text should be a list of one string'
             current_adv_text = current_adv_text[0]
 
-            print('Found adversarial text!')
+            debug_log('Found adversarial text!')
 
             with torch.no_grad():
                 # self.model is T5ForConditionalGeneration
-                print('Tokenizing input')
+                debug_log('Tokenizing input')
                 input_ids = self.tokenizer(text[0], return_tensors="pt", padding=True).input_ids.to(self.device)
-                print('Generating original output')
+                debug_log('Generating original output')
                 output = self.model.generate(input_ids=input_ids, max_length=100)
 
                 original_text = text[0]
@@ -72,9 +74,9 @@ class Seq2SickAttack(BaselineAttack):
                 # print('ORI_TEXT:', original_text, '\n')
                 # print('ORI_TEXT_OUTPUT:', original_output, '\n')
                 
-                print('Tokenizing adv input')
+                debug_log('Tokenizing adv input')
                 input_ids = self.tokenizer(current_adv_text, return_tensors="pt", padding=True).input_ids.to(self.device)
-                print('Generating adv output')
+                debug_log('Generating adv output')
                 output = self.model.generate(input_ids=input_ids, max_length=100)
 
                 adversarial_text = current_adv_text.replace('</s>', '')
@@ -83,7 +85,7 @@ class Seq2SickAttack(BaselineAttack):
                 # print('DECODED_ADV_OUTPUT:', adversarial_output)
                 # print('\n-----\n', flush=True)
 
-            print('Returning from attack')
+            debug_log('Returning from attack')
             return (original_text, original_output, adversarial_text, adversarial_output)
 
     def compute_loss(self, text):
@@ -119,3 +121,17 @@ class Seq2SickAttack(BaselineAttack):
                         new_strings.append(candidate_s)
                         break
         return new_strings
+    
+
+debug_step_i = 0
+def debug_log(message: str, is_first=False):
+    global debug_step_i
+
+    if is_first:
+        debug_step_i = 0
+        
+    ANSI_YELLOW, ANSI_RESET = '\033[93m', '\033[0m'
+
+    print(' ', ANSI_YELLOW, f'[{debug_step_i}] ', message, ANSI_RESET, ' '*10, flush=True, sep='', end='\r', file=sys.stderr)
+    debug_step_i += 1
+
