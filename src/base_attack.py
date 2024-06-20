@@ -53,7 +53,7 @@ class BaseAttack:
                 if tk == self.eos_token_id and i != 0:
                     return s[:i + 1]
             return s
-        input_token = self.tokenizer(text, return_tensors="pt", padding=True).input_ids
+        input_token = self.tokenizer(text, return_tensors="pt", padding=True, truncation=True).input_ids
         input_token = input_token.to(self.device)
         out_token = translate(
             self.model, input_token,
@@ -156,7 +156,7 @@ class MyAttack(BaseAttack):
             batch_num += 1
         for i in range(batch_num):
             st, ed = i * batch_size, min(i * batch_size + batch_size, len(new_strings))
-            input_token = self.tokenizer(new_strings[st:ed], return_tensors="pt", padding=True).input_ids
+            input_token = self.tokenizer(new_strings[st:ed], return_tensors="pt", padding=True, truncation=True).input_ids
             input_token = input_token.to(self.device)
             trans_res = translate(
                 self.model, input_token,

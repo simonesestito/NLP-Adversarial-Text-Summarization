@@ -18,7 +18,7 @@ class Seq2SickAttack(BaselineAttack):
             batch_num += 1
         for i in range(batch_num):
             st, ed = i * batch_size, min(i * batch_size + batch_size, len(new_strings))
-            input_token = self.tokenizer(new_strings[st:ed], return_tensors="pt", padding=True).input_ids
+            input_token = self.tokenizer(new_strings[st:ed], return_tensors="pt", padding=True, truncation=True).input_ids
             input_token = input_token.to(self.device)
             trans_res = translate(
                 self.model, input_token,
@@ -65,7 +65,7 @@ class Seq2SickAttack(BaselineAttack):
             with torch.no_grad():
                 # self.model is T5ForConditionalGeneration
                 debug_log('Tokenizing input')
-                input_ids = self.tokenizer(text[0], return_tensors="pt", padding=True).input_ids.to(self.device)
+                input_ids = self.tokenizer(text[0], return_tensors="pt", padding=True, truncation=True).input_ids.to(self.device)
                 debug_log('Generating original output')
                 output = self.model.generate(input_ids=input_ids, max_length=100)
 
@@ -73,9 +73,9 @@ class Seq2SickAttack(BaselineAttack):
                 original_output = self.tokenizer.decode(output[0], skip_special_tokens=True)
                 # print('ORI_TEXT:', original_text, '\n')
                 # print('ORI_TEXT_OUTPUT:', original_output, '\n')
-                
+
                 debug_log('Tokenizing adv input')
-                input_ids = self.tokenizer(current_adv_text, return_tensors="pt", padding=True).input_ids.to(self.device)
+                input_ids = self.tokenizer(current_adv_text, return_tensors="pt", padding=True, truncation=True).input_ids.to(self.device)
                 debug_log('Generating adv output')
                 output = self.model.generate(input_ids=input_ids, max_length=100)
 
@@ -95,7 +95,7 @@ class Seq2SickAttack(BaselineAttack):
 
     def token_replace_mutation(self, current_adv_text, grad, modify_pos):
         new_strings = []
-        current_tensor = self.tokenizer(current_adv_text, return_tensors="pt", padding=True).input_ids[0]
+        current_tensor = self.tokenizer(current_adv_text, return_tensors="pt", padding=True, truncation=True).input_ids[0]
         base_tensor = current_tensor.clone()
         for pos in modify_pos:
             t = current_tensor[0][pos]
@@ -121,7 +121,7 @@ class Seq2SickAttack(BaselineAttack):
                         new_strings.append(candidate_s)
                         break
         return new_strings
-    
+
 
 debug_step_i = 0
 def debug_log(message: str, is_first=False):
@@ -129,9 +129,8 @@ def debug_log(message: str, is_first=False):
 
     if is_first:
         debug_step_i = 0
-        
+
     ANSI_YELLOW, ANSI_RESET = '\033[93m', '\033[0m'
 
     print(' ', ANSI_YELLOW, f'[{debug_step_i}] ', message, ANSI_RESET, ' '*10, flush=True, sep='', end='\r', file=sys.stderr)
     debug_step_i += 1
-
