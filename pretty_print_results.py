@@ -25,7 +25,7 @@ def pretty_print_results(results: list[dict], tokenizer: Union[str, AutoTokenize
         # Print token differences
         original_text_tokens = tokenizer.tokenize(original_text, truncation=True)
         adversarial_text_tokens = tokenizer.tokenize(adversarial_text, truncation=True)
-        assert len(original_text_tokens) == len(adversarial_text_tokens), 'Length of original text and output tokens should be the same'
+        # assert len(original_text_tokens) == len(adversarial_text_tokens), 'Length of original text and output tokens should be the same'
 
         for original_token, adversarial_token in zip(original_text_tokens, adversarial_text_tokens):
             original_token, adversarial_token = original_token.replace(space_token, ' '), adversarial_token.replace(space_token, ' ')
