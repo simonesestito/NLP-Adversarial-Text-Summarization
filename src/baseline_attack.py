@@ -11,7 +11,7 @@ class Seq2SickAttack(BaselineAttack):
         super(Seq2SickAttack, self).__init__(model, tokenizer, space_token, device, config)
 
     @torch.no_grad()
-    def select_apperance_best(self, new_strings, ori_trans: list, batch_size=100):
+    def select_apperance_best(self, new_strings, ori_trans: list, batch_size=10):
         seqs, scores = [], []
         batch_num = len(new_strings) // batch_size
         if batch_size * batch_num != len(new_strings):
