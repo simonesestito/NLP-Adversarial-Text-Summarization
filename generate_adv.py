@@ -13,7 +13,7 @@ ANSI_RED_BOLD = '\033[1;31m'
 ANSI_RESET = '\033[0m'
 
 
-def main(task_id, attack_id, beam, resume_from_index=0):
+def main(task_id, attack_id, beam, resume_from_index=0, batch_size=10):
     # task_id = 0, attack_id = 0, beam = 1
     model_name = MODEL_NAME_LIST[task_id]
     # model_name = 'T5-small'
@@ -37,7 +37,12 @@ def main(task_id, attack_id, beam, resume_from_index=0):
         'tgt': tgt_lang
     }
     attack_class = ATTACKLIST[attack_id]
-    attack = attack_class(model, tokenizer, space_token, device, config)
+
+    # Seq2SickAttack supports batch_size in the select_apperance_best function
+    if attack_class == Seq2SickAttack:
+        attack = attack_class(model, tokenizer, space_token, device, config, batch_size)
+    else:
+        attack = attack_class(model, tokenizer, space_token, device, config)
 
     results = []
     try:
@@ -76,8 +81,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Transformer')
     parser.add_argument('--beam', default=2, type=int, help='beam size')
     parser.add_argument('--resume-from-index', default=0, type=int, help='Index of the dataset sample to resume from')
+    parser.add_argument('--batch_size', default=10, type=int, help='Batch size for Seq2SickAttack')
     args = parser.parse_args()
-    main(0, 0, args.beam, args.resume_from_index)
+    main(0, 0, args.beam, args.resume_from_index, args.batch_size)
     exit(0)
-
-

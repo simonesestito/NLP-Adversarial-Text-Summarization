@@ -7,8 +7,11 @@ from .base_attack import BaselineAttack
 from .TranslateAPI import translate
 
 class Seq2SickAttack(BaselineAttack):
-    def __init__(self, model, tokenizer, space_token, device, config):
+    def __init__(self, model, tokenizer, space_token, device, config, batch_size):
         super(Seq2SickAttack, self).__init__(model, tokenizer, space_token, device, config)
+
+        # this batch_size will be used in the select_appearance_best function
+        self.batch_size = batch_size
 
     @torch.no_grad()
     def select_apperance_best(self, new_strings, ori_trans: list, batch_size=10):
@@ -56,7 +59,7 @@ class Seq2SickAttack(BaselineAttack):
             new_strings = self.token_replace_mutation(current_adv_text, grad, modify_pos)
 
             debug_log('Selecting best appearance')
-            current_adv_text, _, _ = self.select_apperance_best(new_strings, ori_trans)
+            current_adv_text, _, _ = self.select_apperance_best(new_strings, ori_trans, batch_size=self.batch_size)
             assert len(current_adv_text) == 1, 'current_adv_text should be a list of one string'
             current_adv_text = current_adv_text[0]
 
