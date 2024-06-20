@@ -15,7 +15,7 @@ space_token = '▁'
 def pretty_print_results(results: list[dict], tokenizer: Union[str, AutoTokenizer] = 'google/pegasus-xsum'):
     if type(tokenizer) == str:
         tokenizer = AutoTokenizer.from_pretrained(tokenizer)
-    
+
     for result in results:
         original_text = result['original_text']
         original_output = result['original_output']
@@ -23,8 +23,8 @@ def pretty_print_results(results: list[dict], tokenizer: Union[str, AutoTokenize
         adversarial_output = result['adversarial_output']
 
         # Print token differences
-        original_text_tokens = tokenizer.tokenize(original_text)
-        adversarial_text_tokens = tokenizer.tokenize(adversarial_text)
+        original_text_tokens = tokenizer.tokenize(original_text, truncation=True)
+        adversarial_text_tokens = tokenizer.tokenize(adversarial_text, truncation=True)
         assert len(original_text_tokens) == len(adversarial_text_tokens), 'Length of original text and output tokens should be the same'
 
         for original_token, adversarial_token in zip(original_text_tokens, adversarial_text_tokens):
