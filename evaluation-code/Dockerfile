@@ -8,5 +8,8 @@ RUN python evaluator.py
 
 # Copy all other files
 COPY *.py .
+COPY *_input_texts.txt .
+COPY *_summaries.txt .
+COPY *_references.txt .
 
 ENTRYPOINT ["python", "run_evaluation.py"]
