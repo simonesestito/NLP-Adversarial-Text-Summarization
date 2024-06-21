@@ -2,7 +2,5 @@
 *_references.txt
 *_summaries.txt
 *_metrics.txt
-*_input_texts.txt.bak
-*_references.txt.bak
-*_summaries.txt.bak
-*_metrics.txt.bak
+
+*.bak
