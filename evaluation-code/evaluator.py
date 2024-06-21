@@ -1,3 +1,4 @@
+import sys
 from summ_eval.bert_score_metric import BertScoreMetric
 from summ_eval.blanc_metric import BlancMetric
 from summ_eval.bleu_metric import BleuMetric
@@ -30,10 +31,19 @@ def run_evaluation(input_texts: list[str], summaries: list[str], references: lis
     rouge = RougeMetric()
 
     # Evaluate the metrics
+    print('Evaluating with BertScoreMetric...', file=sys.stderr)
     bert_score_dict = bert_score.evaluate_batch(summaries, references)
+
+    print('Evaluating with BlancMetric...', file=sys.stderr)
     blanc_dict = blanc.evaluate_batch(summaries, input_texts)  #! BLANC works on input texts, not on references
+
+    print('Evaluating with BleuMetric...', file=sys.stderr)
     bleu_dict = bleu.evaluate_batch(summaries, references)
+
+    # print('Evaluating with MoverScoreMetric...')
     # mover_score_dict = mover_score.evaluate_batch(summaries, references)
+
+    print('Evaluating with RougeMetric...', file=sys.stderr)
     rouge_dict = rouge.evaluate_batch(summaries, references)
 
     return {
