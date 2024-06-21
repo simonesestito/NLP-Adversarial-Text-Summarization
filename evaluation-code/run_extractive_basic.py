@@ -1,8 +1,8 @@
 # From https://colab.research.google.com/drive/1kqu4VEbbQuRz0sIu5qt8DI2n_3YP-TPp
 
-from tqdm import tqdm
-import itertools
 from collections import defaultdict
+import itertools
+from multiprocessing import Process
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 nltk.download('punkt')
@@ -86,7 +86,7 @@ def summarize_dataset(dataset_name: str):
     dataset = load_dataset(dataset_name)
 
     with open(f'{dataset_name}_extractivebasic_summaries.txt', 'w') as f:
-        for i, text in enumerate(tqdm(dataset, desc=dataset_name)):
+        for i, text in enumerate(dataset):
             summary = ' '.join(summarize_corpus(text))
             if summary == '':
                 print('\n>>>>>>>>>>>>>>>>>>')
@@ -98,9 +98,21 @@ def summarize_dataset(dataset_name: str):
             assert '\n' not in summary, 'Summary contains newline characters'
             f.write(summary)
             f.write('\n')
+    
+    print(f'{dataset_name} done', flush=True)
 
 
 if __name__ == '__main__':
     datasets = ['cnndailymail', 'wikihow', 'xsum']
-    for dataset in datasets:
-        summarize_dataset(dataset)
+
+    print('Summarizing datasets:', datasets)
+    processes = [
+        Process(target=summarize_dataset, args=(dataset,))
+        for dataset in datasets
+    ]
+
+    for process in processes:
+        process.start()
+
+    for process in processes:
+        process.join()
