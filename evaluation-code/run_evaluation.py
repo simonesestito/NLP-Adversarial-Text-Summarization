@@ -32,4 +32,3 @@ if __name__ == "__main__":
     # Evaluate the metrics
     results = run_evaluation(input_texts, summaries, references, device='cpu')  # TODO: use a GPU
     print(json.dumps(results, indent=2))
-
