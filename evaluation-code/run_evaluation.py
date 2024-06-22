@@ -4,16 +4,27 @@ import os
 
 from evaluator import run_evaluation
 
+# The maximum number of samples to evaluate
+# This is to prevent the evaluation from taking too long
+# If you want to evaluate all samples, set this to None
+# It was required in our project due to the large number of samples and the time it took to evaluate them
+MAX_SAMPLES = 2000
+
 
 def load_text_file(file_path: str) -> list[str]:
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
     
     with open(file_path, 'r') as file:
-        return [
+        file_lines = [
             line.strip()
             for line in file.readlines()
         ]
+
+    if MAX_SAMPLES is not None:
+        file_lines = file_lines[:MAX_SAMPLES]
+    
+    return file_lines
 
 
 if __name__ == "__main__":
