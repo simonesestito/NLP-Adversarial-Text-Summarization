@@ -32,7 +32,7 @@ for dataset in $DATASETS; do
 
     # For every model, run the evaluation
     for model in $MODELS; do
-        OUTPUT_FILE="${dataset}_${model}_metrics_${METRIC_NAME}.txt"
+        OUTPUT_FILE="${dataset}_${model}_metrics_${METRIC_NAME}.json"
 
         # Ask if the metrics already exist and it is not an empty file
         if [ -s "$OUTPUT_FILE" ]; then

@@ -1,6 +1,6 @@
 *_input_texts.txt
 *_references.txt
 *_summaries.txt
-*_metrics*.txt
+*_metrics*.json
 
 *.bak
