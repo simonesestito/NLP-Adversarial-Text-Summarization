@@ -1,6 +1,13 @@
 #!/bin/bash --
 set -euo pipefail
 
+# Metric name as first argument
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <metric_name>"
+    exit 1
+fi
+METRIC_NAME="$1"
+
 # List all files in this directory ending by _input_texts.txt (the input texts)
 INPUT_TEXTS=$(ls *_input_texts.txt)
 
@@ -25,9 +32,11 @@ for dataset in $DATASETS; do
 
     # For every model, run the evaluation
     for model in $MODELS; do
+        OUTPUT_FILE="${dataset}_${model}_metrics_${METRIC_NAME}.txt"
+
         # Ask if the metrics already exist and it is not an empty file
-        if [ -s "${dataset}_${model}_metrics.txt" ]; then
-            echo "Metrics already exist for $dataset $model. Do you want to overwrite them? [y/N]"
+        if [ -s "$OUTPUT_FILE" ]; then
+            echo "Metric $METRIC_NAME already exist for $dataset $model. Do you want to overwrite them? [y/N]"
             read -r answer
             if [ "$answer" != "y" ]; then
                 echo "Skipping $dataset $model..."
@@ -36,13 +45,14 @@ for dataset in $DATASETS; do
         fi
 
         # Run the evaluation
-        echo "Evaluating $dataset $model..."
+        echo "Evaluating $dataset $model on metric $METRIC_NAME..."
         docker run summeval-evaluation:latest \
             --input-texts ${dataset}_input_texts.txt \
             --references ${dataset}_references.txt \
             --summaries ${dataset}_${model}_summaries.txt \
-            > ${dataset}_${model}_metrics.txt
-        echo "Results saved to ${dataset}_${model}_metrics.txt"
+            --metric "$METRIC_NAME" \
+            > "$OUTPUT_FILE"
+        echo "Results saved to $OUTPUT_FILE"
         echo
     done
 done
