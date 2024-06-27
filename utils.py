@@ -19,17 +19,10 @@ def load_model(model_name):
         space_token = None  # Neither Pegasus or Bart use a special token for space
         src_lang, tgt_lang = 'en', 'de'  # They are actually ignored
 
-    if model_name == 'T5-small':
+    elif model_name == 'T5-small':
         tokenizer = AutoTokenizer.from_pretrained("t5-small")
         model = AutoModelForSeq2SeqLM.from_pretrained("t5-small")
         space_token = '▁'
-        src_lang, tgt_lang = 'en', 'de'
-
-    #! Our model
-    elif model_name == 'google/pegasus-xsum':
-        tokenizer = AutoTokenizer.from_pretrained("google/pegasus-xsum")
-        model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-xsum")
-        space_token = None
         src_lang, tgt_lang = 'en', 'de'
 
     elif model_name == 'mbart-en-es':
@@ -68,11 +61,11 @@ def load_model(model_name):
 
 def load_dataset(model_name):
     if model_name in MODEL_NAME_LIST:
-        with open('./data/xsum.txt', 'r') as f:
+        with open('./data/translation2019zh/valid.en') as f: # open('./data/xsum.txt', 'r') as f:
             data = f.readlines()
             return data
         
-    if model_name == 'Helsinki-en-zh':
+    elif model_name == 'Helsinki-en-zh':
         with open('./data/Helsinki-en-zh.txt', 'r') as f:
             data = f.readlines()
             return data

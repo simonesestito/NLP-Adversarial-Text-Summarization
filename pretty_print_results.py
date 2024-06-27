@@ -12,7 +12,7 @@ ANSI_BOLD = '\033[1m'
 space_token = '▁'
 
 
-def pretty_print_results(results: list[dict], tokenizer: Union[str, AutoTokenizer] = 'google/pegasus-xsum'):
+def pretty_print_results(results: list[dict], tokenizer: Union[str, AutoTokenizer]):
     if type(tokenizer) == str:
         tokenizer = AutoTokenizer.from_pretrained(tokenizer)
 

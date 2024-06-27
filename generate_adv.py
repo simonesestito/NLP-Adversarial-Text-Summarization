@@ -19,6 +19,7 @@ def main(task_id, attack_id, beam, resume_from_index=0, batch_size=10):
 
     # task_id = 0, attack_id = 0, beam = 1
     model_name = MODEL_NAME_LIST[task_id]
+    print('Loading model:', model_name, flush=True)
     # model_name = 'T5-small'
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
