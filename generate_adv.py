@@ -14,6 +14,9 @@ ANSI_RESET = '\033[0m'
 
 
 def main(task_id, attack_id, beam, resume_from_index=0, batch_size=10):
+    current_timestamp = get_current_timestamp()
+    result_filename = 'adversarial_result__%s.json' % current_timestamp
+
     # task_id = 0, attack_id = 0, beam = 1
     model_name = MODEL_NAME_LIST[task_id]
     # model_name = 'T5-small'
@@ -45,31 +48,26 @@ def main(task_id, attack_id, beam, resume_from_index=0, batch_size=10):
         attack = attack_class(model, tokenizer, space_token, device, config)
 
     results = []
-    try:
-        for i, src_text in enumerate(dataset[resume_from_index:]):
-            if i >= MAX_TESTING_NUM:
-                break
-            src_text = src_text.replace('\n', '')
-            original_text, original_output, adversarial_text, adversarial_output = attack.run_attack([src_text])
-            result_dict = {
-                'original_text': original_text,
-                'original_output': original_output,
-                'adversarial_text': adversarial_text,
-                'adversarial_output': adversarial_output
-            }
-            results.append(result_dict)
+    for i, src_text in enumerate(dataset[resume_from_index:]):
+        if i >= MAX_TESTING_NUM:
+            break
+        src_text = src_text.replace('\n', '')
+        original_text, original_output, adversarial_text, adversarial_output = attack.run_attack([src_text])
+        result_dict = {
+            'original_text': original_text,
+            'original_output': original_output,
+            'adversarial_text': adversarial_text,
+            'adversarial_output': adversarial_output
+        }
+        results.append(result_dict)
 
-            # Also, log the result to console
-            pretty_print_results([result_dict], tokenizer)
-    except KeyboardInterrupt:
-        print(ANSI_RED_BOLD, 'Caught KeyboardInterrupt! Saving results so far...', ANSI_RESET, flush=True, sep='')
-    finally:
-        # Save result to JSON file
-        current_timestamp = get_current_timestamp()
-        result_filename = 'adversarial_result__%s.json' % current_timestamp
+        # Save results after each iteration
         with open(result_filename, 'w') as f:
             json.dump(results, f, indent=4)
-        print('Save result to %s' % result_filename)
+        print('Save results so far to %s' % result_filename)
+
+        # Also, log the result to console
+        pretty_print_results([result_dict], tokenizer)
 
 
 def get_current_timestamp() -> str:
