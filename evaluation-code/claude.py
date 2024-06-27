@@ -66,10 +66,9 @@ def send_prompt(prompt):
     
     # Handle rate limiting
     if response.status_code == 429:
-        log('Rate limit exceeded')
         retry_after = int(response.headers['Retry-After'])  # Number of seconds to wait
         retry_after += 5  # Add a buffer of 5 seconds (just in case)
-        log(f'Retrying in {retry_after} seconds...')
+        log(f'Rate limit exceeded. Retrying in {retry_after} seconds...')
         time.sleep(retry_after)
         raise RateLimitError()
 

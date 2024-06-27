@@ -80,7 +80,7 @@ if __name__ == '__main__':
     parser.add_argument('--task-id', default=0, type=int, help='task id')
     parser.add_argument('--beam', default=2, type=int, help='beam size')
     parser.add_argument('--resume-from-index', default=0, type=int, help='Index of the dataset sample to resume from')
-    parser.add_argument('--batch_size', default=10, type=int, help='Batch size for Seq2SickAttack')
+    parser.add_argument('--batch-size', default=10, type=int, help='Batch size for Seq2SickAttack')
     args = parser.parse_args()
     main(args.task_id, 0, args.beam, args.resume_from_index, args.batch_size)
     exit(0)
