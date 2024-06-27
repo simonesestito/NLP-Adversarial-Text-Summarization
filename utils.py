@@ -7,13 +7,18 @@ from src import *
 
 BEAM_LIST = [4, 5, 1, 5]
 
-OUR_BEST_MODEL = 'google/pegasus-xsum'
-
-MODEL_NAME_LIST = [ 'google/pegasus-xsum' ]
+MODEL_NAME_LIST = [ 'google/pegasus-xsum', 'facebook/bart-large-xsum' ]
 ATTACKLIST = [ Seq2SickAttack ]
 
 
 def load_model(model_name):
+    # Our models
+    if model_name in MODEL_NAME_LIST:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+        space_token = None  # Neither Pegasus or Bart use a special token for space
+        src_lang, tgt_lang = 'en', 'de'  # They are actually ignored
+
     if model_name == 'T5-small':
         tokenizer = AutoTokenizer.from_pretrained("t5-small")
         model = AutoModelForSeq2SeqLM.from_pretrained("t5-small")
@@ -62,6 +67,11 @@ def load_model(model_name):
 
 
 def load_dataset(model_name):
+    if model_name in MODEL_NAME_LIST:
+        with open('./data/xsum.txt', 'r') as f:
+            data = f.readlines()
+            return data
+        
     if model_name == 'Helsinki-en-zh':
         with open('./data/Helsinki-en-zh.txt', 'r') as f:
             data = f.readlines()
@@ -89,12 +99,6 @@ def load_dataset(model_name):
         #     data = f.readlines()
         #     return data
         with open('./data/translation2019zh/valid.en', 'r') as f:
-            data = f.readlines()
-            return data
-        
-    elif model_name == 'google/pegasus-xsum':
-        # FIXME: Use the WikiHow dataset
-        with open('./data/xsum.txt', 'r') as f:
             data = f.readlines()
             return data
 
