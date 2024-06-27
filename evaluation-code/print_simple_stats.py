@@ -66,10 +66,9 @@ for summary_file in summaries_files:
 
     results_dict[model_name][dataset_name] = compute_stats(input_texts, summaries, references)
 
-print(json.dumps(results_dict, indent=2))
 
 # Compute over all the datasets
-overall_stats = dict()
+OVERALL_STATS_KEY = 'overall'
 summaries, input_texts, references = {model_name: [] for model_name in model_names}, {model_name: [] for model_name in model_names}, {model_name: [] for model_name in model_names}
 for summary_file in summaries_files:
     input_text, summary, reference, model_name, _ = load_summary_file(summary_file)
@@ -79,7 +78,12 @@ for summary_file in summaries_files:
         references[model_name].extend(reference)
 
 for model_name in model_names:
-    overall_stats[model_name] = compute_stats(input_texts[model_name], summaries[model_name], references[model_name])
+    results_dict[model_name][OVERALL_STATS_KEY] = compute_stats(input_texts[model_name], summaries[model_name], references[model_name])
+
+# Save the results to a json file
+with open('summaries_stats.json', 'w') as f:
+    json.dump(results_dict, f, indent=4)
+
 
 def latex_print_stats(stats: dict):
     # avg, std = stats['input_avg_reduction'], stats['input_std_reduction']
@@ -92,5 +96,5 @@ for model_name in model_names:
     print(model_name, end='\t')
     for dataset_name in dataset_names:
         latex_print_stats(results_dict[model_name][dataset_name])
-    latex_print_stats(overall_stats[model_name])
+    latex_print_stats(results_dict[model_name][OVERALL_STATS_KEY])
     print(' \\\\')
