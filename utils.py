@@ -7,7 +7,7 @@ from src import *
 
 BEAM_LIST = [4, 5, 1, 5]
 
-MODEL_NAME_LIST = [ 'google/pegasus-xsum', 'facebook/bart-large-xsum' ]
+MODEL_NAME_LIST = [ 'google/pegasus-xsum', 'facebook/bart-large-xsum', 't5-small' ]
 ATTACKLIST = [ Seq2SickAttack ]
 
 
@@ -16,7 +16,7 @@ def load_model(model_name):
     if model_name in MODEL_NAME_LIST:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-        space_token = None  # Neither Pegasus or Bart use a special token for space
+        space_token = '▁' if model_name == 't5-small' else None  # Neither Pegasus or Bart use a special token for space
         src_lang, tgt_lang = 'en', 'de'  # They are actually ignored
 
     elif model_name == 'T5-small':
