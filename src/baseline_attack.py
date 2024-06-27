@@ -135,5 +135,5 @@ def debug_log(message: str, is_first=False):
 
     ANSI_YELLOW, ANSI_RESET = '\033[93m', '\033[0m'
 
-    print(' ', ANSI_YELLOW, f'[{debug_step_i}] ', message, ANSI_RESET, ' '*10, flush=True, sep='', end='\r', file=sys.stderr)
+    print(' ', ANSI_YELLOW, f'[{debug_step_i}] ', message, ANSI_RESET, ' '*10, flush=True, sep='', file=sys.stderr)
     debug_step_i += 1
