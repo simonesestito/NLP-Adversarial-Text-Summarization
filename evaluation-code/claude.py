@@ -8,14 +8,13 @@ API_URL = 'https://api.anthropic.com/v1/messages'
 API_KEY = os.getenv('ANTHROPIC_API_KEY')
 assert API_KEY, 'You need to set the environment variable ANTROPHIC_API_KEY'
 
-MODEL_CONTEXT = """You are a text summarization machine. The following text is a long text, and I want you to output only the text of a short summary of it. Use at most 200 characters for your output."""
-PROMPT_PREFIX = "Here it is the long text to summarize:"
+MODEL_CONTEXT = """You are a text summarization machine. The following text is a long text, and I want you to output only the text of a short summary of it. Use at most 200 characters for your output. Do not refer to the text in third person. Start directly with the summary content."""
 
 MODEL_NAME = 'claude-3-haiku-20240307'
 MODEL_MAX_TOKENS = 150
 MODEL_TEMPERATURE = 0.05
 
-MAX_LINES = 2000  # Maximum number of lines to read from the input file dataset
+MAX_LINES = 1000  # Maximum number of lines to read from the input file dataset
 
 
 # Create a custom exception for rate limiting
@@ -60,28 +59,32 @@ def send_prompt(prompt):
     elif response.status_code == 500:
         raise RuntimeError('Internal server error')
     elif response.status_code == 529:
-        raise RuntimeError('Anthropic API is overloaded or down')
-    elif response.status_code != 200:
-        raise RuntimeError('Unknown error')
-    
-    # Handle rate limiting
-    if response.status_code == 429:
+        # raise RuntimeError('Anthropic API is overloaded or down')
+        # Sleep for a while
+        log('Anthropic API is overloaded or down. Retrying in 5 seconds...')
+        time.sleep(5)
+        raise RateLimitError()  # Retry without recursion
+    elif response.status_code == 429:
+        # Handle rate limiting
         retry_after = int(response.headers['Retry-After'])  # Number of seconds to wait
         retry_after += 5  # Add a buffer of 5 seconds (just in case)
         log(f'Rate limit exceeded. Retrying in {retry_after} seconds...')
         time.sleep(retry_after)
         raise RateLimitError()
+    elif response.status_code != 200:
+        raise RuntimeError('Unknown error')
 
     # Count and inform!
-    count_used_tokens = response['usage']['input_tokens'] + response['usage']['output_tokens']
+    response_body = response.json()
+    count_used_tokens = response_body['usage']['input_tokens'] + response_body['usage']['output_tokens']
     log(f'Used {count_used_tokens} tokens.')
 
-    return response['content']['text']
+    response_text = next(content_part for content_part in response_body['content'] if content_part['type'] == 'text')
+    return response_text['text']
 
 
 def summarize(text):
-    prompt = f"{PROMPT_PREFIX}\n\n{text}"
-    return send_prompt(prompt)
+    return send_prompt(text).replace('\n', ' ')
 
 
 def main():
@@ -111,11 +114,14 @@ def main():
         # For each text, summarize it and APPEND the output to {dataset}_claude_summaries.txt, but also log on the console (STDOUT this time)
         with open(summary_file, 'a') as f:
             for input_text in tqdm(input_texts, desc=dataset_name):
-                try:
-                    summary = summarize(input_text)
-                except RateLimitError:
-                    # Retry after a while
-                    summary = summarize(input_text)
+                # Retry on loop until success
+                summary = None
+                while not summary:
+                    try:
+                        summary = summarize(input_text)
+                    except RateLimitError:
+                        # Retry after a while
+                        pass
                 
                 f.write(f'{summary}\n')
                 print(f'>>> {summary}\n')
