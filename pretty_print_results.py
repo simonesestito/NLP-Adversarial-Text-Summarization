@@ -42,11 +42,11 @@ def pretty_print_results(results: list[dict], tokenizer: Union[str, AutoTokenize
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Usage: python pretty_print_results.py <results_filename>')
+    if len(sys.argv) != 3:
+        print('Usage: python pretty_print_results.py <tokenizer_name> <results_filename>')
         sys.exit(1)
 
-    results_filename = sys.argv[1]
+    tokenizer_name, results_filename = sys.argv[1:]
     with open(results_filename, 'r') as f:
         results = json.load(f)
-    pretty_print_results(results)
+    pretty_print_results(results, tokenizer_name)
