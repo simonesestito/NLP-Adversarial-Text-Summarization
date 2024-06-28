@@ -9,7 +9,7 @@ MAX_LINES = 2000
 
 summaries_files = [f for f in os.listdir() if f.endswith('_summaries.txt')]
 dataset_names = ['cnndailymail', 'xsum', 'wikihow']
-model_names = ['bart', 'bertextractive', 'extractivebasic', 'pegasusstd', 'pegasuslarge', 'textrank']
+model_names = ['bart', 'bertextractive', 'claude', 'extractivebasic', 'pegasusstd', 'pegasuslarge', 'textrank']
 
 def load_summary_file(summary_file):
     with open(summary_file) as f:
@@ -86,14 +86,14 @@ with open('summaries_stats.json', 'w') as f:
 
 
 def latex_print_stats(stats: dict):
-    # avg, std = stats['input_avg_reduction'], stats['input_std_reduction']
-    avg, std = stats['refs_avg_reduction'], stats['refs_std_reduction']
+    avg, std = stats['input_avg_reduction'], stats['input_std_reduction']
+    # avg, std = stats['refs_avg_reduction'], stats['refs_std_reduction']
     avg, std = f"{avg*100:.1f}\\%", f"{std*100:.1f}\\%"
     print(f" & {avg} ± {std}", end='')
 
 # Print as table
 for model_name in model_names:
-    print(model_name, end='\t')
+    print(f'{model_name:<15}:', end='')
     for dataset_name in dataset_names:
         latex_print_stats(results_dict[model_name][dataset_name])
     latex_print_stats(results_dict[model_name][OVERALL_STATS_KEY])

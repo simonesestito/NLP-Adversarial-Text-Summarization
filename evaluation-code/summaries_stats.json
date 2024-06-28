@@ -1,0 +1,184 @@
+{
+    "extractivebasic": {
+        "wikihow": {
+            "input_avg_reduction": 0.4024426173654805,
+            "input_std_reduction": 0.08253301061618724,
+            "refs_avg_reduction": -6.779756058030876,
+            "refs_std_reduction": 5.645906082665502
+        },
+        "xsum": {
+            "input_avg_reduction": 0.40309484956941233,
+            "input_std_reduction": 0.09683461883155213,
+            "refs_avg_reduction": -10.073242872765977,
+            "refs_std_reduction": 10.554577181058209
+        },
+        "cnndailymail": {
+            "input_avg_reduction": 0.3812001969786716,
+            "input_std_reduction": 0.08251671054023933,
+            "refs_avg_reduction": -8.68035742183597,
+            "refs_std_reduction": 6.607290540449636
+        },
+        "overall": {
+            "input_avg_reduction": 0.39557922130452144,
+            "input_std_reduction": 0.08814381426259078,
+            "refs_avg_reduction": -8.511118784210941,
+            "refs_std_reduction": 8.008290153027339
+        }
+    },
+    "textrank": {
+        "cnndailymail": {
+            "input_avg_reduction": 0.7541370460522092,
+            "input_std_reduction": 0.15140547709600022,
+            "refs_avg_reduction": -1.8314478713407496,
+            "refs_std_reduction": 1.0420677863908305
+        },
+        "wikihow": {
+            "input_avg_reduction": 0.6679001993911902,
+            "input_std_reduction": 0.2510027151317964,
+            "refs_avg_reduction": -2.2035508723307267,
+            "refs_std_reduction": 2.3468377000509486
+        },
+        "xsum": {
+            "input_avg_reduction": 0.5828510768196734,
+            "input_std_reduction": 0.2797699523468595,
+            "refs_avg_reduction": -3.819481817630658,
+            "refs_std_reduction": 1.7313398596197318
+        },
+        "overall": {
+            "input_avg_reduction": 0.6682961074210242,
+            "input_std_reduction": 0.24417676962744425,
+            "refs_avg_reduction": -2.618160187100711,
+            "refs_std_reduction": 1.9853699053294454
+        }
+    },
+    "bertextractive": {
+        "cnndailymail": {
+            "input_avg_reduction": 0.7623639019485073,
+            "input_std_reduction": 0.048764965324269015,
+            "refs_avg_reduction": -2.493168979670319,
+            "refs_std_reduction": 2.05462160148316
+        },
+        "xsum": {
+            "input_avg_reduction": 0.713285953156602,
+            "input_std_reduction": 0.13226953191820293,
+            "refs_avg_reduction": -3.4185286041825242,
+            "refs_std_reduction": 3.405144228618557
+        },
+        "wikihow": {
+            "input_avg_reduction": 0.7557794289904534,
+            "input_std_reduction": 0.09562064723802863,
+            "refs_avg_reduction": -1.9547071774156195,
+            "refs_std_reduction": 1.9778814281387047
+        },
+        "overall": {
+            "input_avg_reduction": 0.7438097613651876,
+            "input_std_reduction": 0.10072369969137786,
+            "refs_avg_reduction": -2.622134920422821,
+            "refs_std_reduction": 2.63469334030191
+        }
+    },
+    "bart": {
+        "cnndailymail": {
+            "input_avg_reduction": 0.9539040868180321,
+            "input_std_reduction": 0.02612294144875668,
+            "refs_avg_reduction": 0.4448199601326793,
+            "refs_std_reduction": 0.2416560173665602
+        },
+        "xsum": {
+            "input_avg_reduction": 0.9128670080245948,
+            "input_std_reduction": 0.13215776853507247,
+            "refs_avg_reduction": 0.096183622767,
+            "refs_std_reduction": 0.27158576482186436
+        },
+        "wikihow": {
+            "input_avg_reduction": 0.9458267401356735,
+            "input_std_reduction": 0.09146912862260383,
+            "refs_avg_reduction": 0.5058092171472701,
+            "refs_std_reduction": 0.4653781826188458
+        },
+        "overall": {
+            "input_avg_reduction": 0.9375326116594335,
+            "input_std_reduction": 0.09567287165789364,
+            "refs_avg_reduction": 0.3489376000156499,
+            "refs_std_reduction": 0.38575467830348537
+        }
+    },
+    "pegasuslarge": {
+        "wikihow": {
+            "input_avg_reduction": 0.827358737111894,
+            "input_std_reduction": 0.09958076385252654,
+            "refs_avg_reduction": -1.0351014259872329,
+            "refs_std_reduction": 1.688732078906372
+        },
+        "cnndailymail": {
+            "input_avg_reduction": 0.8458447954420907,
+            "input_std_reduction": 0.06347814072567258,
+            "refs_avg_reduction": -1.1101678694247397,
+            "refs_std_reduction": 1.1879049250130254
+        },
+        "xsum": {
+            "input_avg_reduction": 0.8171818699945974,
+            "input_std_reduction": 0.09028890809097834,
+            "refs_avg_reduction": -1.8669278003538583,
+            "refs_std_reduction": 2.0656527939123137
+        },
+        "overall": {
+            "input_avg_reduction": 0.8301284675161941,
+            "input_std_reduction": 0.08664136533449274,
+            "refs_avg_reduction": -1.3373990319219435,
+            "refs_std_reduction": 1.7275487615458782
+        }
+    },
+    "pegasusstd": {
+        "cnndailymail": {
+            "input_avg_reduction": 0.9491018316060011,
+            "input_std_reduction": 0.040817192209337674,
+            "refs_avg_reduction": 0.4101712805845489,
+            "refs_std_reduction": 0.3925859574284489
+        },
+        "wikihow": {
+            "input_avg_reduction": 0.9467945137909929,
+            "input_std_reduction": 0.08786921329024315,
+            "refs_avg_reduction": 0.5205892882253205,
+            "refs_std_reduction": 0.5083112863285999
+        },
+        "xsum": {
+            "input_avg_reduction": 0.913145346784112,
+            "input_std_reduction": 0.17550848981581194,
+            "refs_avg_reduction": 0.09603129601439697,
+            "refs_std_reduction": 0.511289408908668
+        },
+        "overall": {
+            "input_avg_reduction": 0.9363472307270354,
+            "input_std_reduction": 0.11690512507588974,
+            "refs_avg_reduction": 0.34226395494142214,
+            "refs_std_reduction": 0.5069394471171452
+        }
+    },
+    "claude": {
+        "cnndailymail": {
+            "input_avg_reduction": 0.8830549148216434,
+            "input_std_reduction": 0.06352857872311551,
+            "refs_avg_reduction": -0.42686545041092566,
+            "refs_std_reduction": 0.5901512705449177
+        },
+        "wikihow": {
+            "input_avg_reduction": 0.8233690009517948,
+            "input_std_reduction": 0.15922818863271856,
+            "refs_avg_reduction": -0.6817854209801534,
+            "refs_std_reduction": 1.2515128019610606
+        },
+        "xsum": {
+            "input_avg_reduction": 0.7721154842467983,
+            "input_std_reduction": 0.3165195877862437,
+            "refs_avg_reduction": -1.5121037467467178,
+            "refs_std_reduction": 0.9695243220023533
+        },
+        "overall": {
+            "input_avg_reduction": 0.8261798000067456,
+            "input_std_reduction": 0.21271246267934538,
+            "refs_avg_reduction": -0.8735848727125989,
+            "refs_std_reduction": 1.0799061457670807
+        }
+    }
+}
