@@ -1,6 +1,8 @@
 # NLP-Adversarial-Text-Summarization
 NLP project to perform Adversarial Attack on Text summarization models, using Seq2Sick
 
+[Download PDF paper](https://github.com/simonesestito/NLP-Adversarial-Text-Summarization/blob/main/paper.pdf?raw=true)
+
 ---
 
 The original implementation of [Seq2Sick](https://github.com/cmhcbb/Seq2Sick) is broken with modern Python environment because of ancient dependencies.
